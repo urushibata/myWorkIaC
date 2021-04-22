@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  ClusterName:
+    Description: mywork ecs cluster name.
+    Type: String
+    Default: mywork-web-cluster
+  FrontendTaskName:
+    Description: mywork frontend task name.
+    Type: String
+    Default: my-work-nginx
+  BuckendTaskName:
+    Description: mywork backend task name.
+    Type: String
+    Default: my-work-backend
+  FrontendContainerName:
+    Description: mywork frontend container name.
+    Type: String
+    Default: myWork-nginx
+
+Resources:
+  FrontendService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterName
+      ServiceName: my-work-frontend-service
+      DesiredCount: 1
+      HealthCheckGracePeriodSeconds: 60
+      TaskDefinition: !Ref FrontendTaskName
+      LoadBalancers:
+        - ContainerPort: 80
+          TargetGroupArn: !Sub "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/myWork-http-targetgroup/6656022fbf30207a"
+          ContainerName: !Ref FrontendContainerName
+        - ContainerPort: 443
+          TargetGroupArn: !Sub "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/myWork-https-targetgroup/547762ea3a6be70e"
+          ContainerName: !Ref FrontendContainerName
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg-089424c992277b04f
+          Subnets:
+            - subnet-0d1533c6c109ef9df
+
+  BackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterName
+      ServiceName: my-work-backend-service
+      DesiredCount: 1
+      TaskDefinition: !Ref BuckendTaskName
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg-01668733e080679ac
+          Subnets:
+            - subnet-000315329b5eb1f53
+      ServiceRegistries:
+        - RegistryArn: !Sub "arn:aws:servicediscovery:${AWS::Region}:${AWS::AccountId}:service/srv-6l4wmmoxa7w3qfq2"
+
