@@ -31,9 +31,6 @@ Resources:
         - ContainerPort: 80
           TargetGroupArn: !Sub "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/myWork-http-targetgroup/6656022fbf30207a"
           ContainerName: !Ref FrontendContainerName
-        - ContainerPort: 443
-          TargetGroupArn: !Sub "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/myWork-https-targetgroup/547762ea3a6be70e"
-          ContainerName: !Ref FrontendContainerName
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
